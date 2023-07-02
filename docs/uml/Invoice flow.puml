@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+==Create an invoice action==
+autonumber
+Client -> Ledger: Create invoice Request (issuer_id)
+Ledger -> Client: Create invoice Response (issuer_id)
+
+
+==Create a bid action==
+autonumber
+Client -> Ledger: Create bid Request (investor_id)
+Ledger -> "Accounts service": Create transaction Request (investor_id)
+Ledger -> Ledger: Check status
+"Accounts service" -> Ledger: Create transaction Response (transaction_id)
+Ledger -> Client: Create bid Response (deal_id)
+
+==Invoice is new==
+autonumber
+queue MQ
+Ledger -> MQ ** : Invoice if full
+Ledger -> Ledger: Get filled invoices([]invoice)\nSet status wait (invoice)
+
+Ledger -> Client: New invoices for check ([]invoice)
+
+==Invoice is wait==
+autonumber
+Client -> Ledger: Approve/Decline Request (invoice_id)
+activate Ledger
+Ledger -> Ledger: Lock and set status Processing (invoice_id)
+Ledger -> Client: Approve/Decline Response
+deactivate Ledger
+Ledger -> MQ : Enqueue Approve/Decline transaction Request (transaction_id)
+MQ -> "Accounts service": Dequeue transaction Request
+activate "Accounts service"
+"Accounts service" -> "Accounts service": Set status transaction with lock (transaction_id)
+"Accounts service" -> MQ: Approve/Decline transaction
+deactivate "Accounts service"
+MQ -> Ledger: Process transaction result
+
+@enduml

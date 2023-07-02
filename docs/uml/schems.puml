@@ -1,0 +1,109 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+package "Users service" {
+  [Authorization] -- "JWT"
+  [Managment] -- "CRUD user"
+  [Managment] -- "list of users"
+}
+
+database "Postgresql" {
+  folder "Users schema" {
+    map user {
+      id => UUID
+      email => varchar[255]
+      is_dealer => bool
+      update,create => date
+    }
+  }
+}
+[Users service] --> "Users schema"
+
+
+package "Ledger service" {
+  [Manage invoice] -- "Create an invoice (user_id)"
+  [Manage invoice] --- "Retrieve an invoice (invoice_id)"
+  [Manage invoice] --- "Place a bid (investor_id)"
+  [Execution] -- "Approve a trade (invoice_id)"
+  [Execution] -- "Decline a trade (invoice_id)"
+}
+
+"Place a bid (investor_id)" <.. "Users service":client
+"Retrieve an invoice (invoice_id)" <.. "Users service":client
+
+database "Postgresql" {
+  folder "Invoice schema" {
+    map invoice {
+      id => UUID
+      issuer_id => UUID
+      description => text
+      volume => uint
+      quantity => uint
+      unit_price => money
+      status => ENUM[new, wait, decline, approved]
+      update,create => date
+    }
+    map deal {
+      id => UUID
+      investor_id => UUID
+      invoice_id => UUID
+      quantity => uint
+      transaction_id => UUID
+      update,create => date
+    }
+  }
+}
+[Ledger service] ---> "Invoice schema"
+
+
+package "Accounts service" {
+  [Balances] -- "Read balance"
+  [Balances] -- "Deposit"
+  [Balances] -- "Withdrawal"
+  [Transactions] -- "Create transaction"
+  [Transactions] -- "Approve,decline"
+  [Accounts] -- "CRUD account"
+  [Accounts] -- "list of investors"
+}
+
+database "Postgresql" {
+  folder "Accounts schema" {
+    map account {
+      id => UUID
+      user_id => UUID
+      cash => money
+      equity => money
+      update,create => date
+    }
+    map transaction {
+      id => UUID
+      from_account_id => UUID
+      to_account_id => UUID
+      status => ENUM[new, decline, complete]
+      update,create => date
+    }
+    map issuer {
+      id => UUID
+      account_id => UUID
+      company => text
+    }
+    map investor {
+      id => UUID
+      account_id => UUID
+      vat => text
+    }
+  }
+}
+
+[Accounts service] --> "Accounts schema"
+transaction *- account
+account <|-- issuer
+account <|- investor
+invoice --* deal
+invoice *..> issuer
+deal *..> investor
+deal *..> transaction
+account ...|> user
+
+
+@enduml

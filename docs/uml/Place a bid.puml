@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+==Initialization==
+Client -> "Users service": Authentication Request
+"Users service" -> Client: Authentication Response
+Client -> "Accounts service": Get investor account Request (user_id)
+"Accounts service" -> Client: Get investor account Response (investor_id)
+
+==Create an bid action==
+autonumber
+Client -> Ledger: Create bid Request (investor_id)
+Ledger -> "Accounts service": Create transaction Request (investor_id)
+"Accounts service" -> Ledger: Create transaction Response (transaction_id)
+Ledger -> Client: Create bid Response (deal_id)
+@enduml

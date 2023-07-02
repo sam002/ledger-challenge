@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+==Initialization==
+Client -> "Users service": Authentication Request
+"Users service" -> Client: Authentication Response
+Client -> "Accounts service": Get issuer account Request (user_id)
+"Accounts service" -> Client: Get issuer account Response (issuer_id)
+
+==Create an invoice action==
+autonumber
+Client -> Ledger: Create invoice Request (issuer_id)
+Ledger -> Client: Create invoice Response (issuer_id)
+@enduml
