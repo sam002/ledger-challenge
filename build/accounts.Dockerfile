@@ -4,7 +4,7 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go build -v -o /usr/local/bin/accounts cmd/accounts/main.go
+RUN go build -v -o /usr/local/bin/accounts cmd/accounts/accounts.go
 
 FROM alpine:3.18
 RUN apk --no-cache add ca-certificates
