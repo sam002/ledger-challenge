@@ -4,12 +4,17 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	iusers "ledger/internal/accounts/users"
+	iusers "ledger/internal/users/users"
 )
 
-type users struct {
+type Users struct {
 	db     *gorm.DB
 	logger *zap.Logger
+}
+type User struct {
+	iusers.User
+	Id    string `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Email string `gorm:"type:varchar(255)"`
 }
 
 func NewUsers(dsn string, logger *zap.Logger) (iusers.Users, error) {
@@ -18,7 +23,7 @@ func NewUsers(dsn string, logger *zap.Logger) (iusers.Users, error) {
 		logger.Error("Cannot init Users")
 		return nil, err
 	}
-	u := users{
+	u := Users{
 		db:     c,
 		logger: logger,
 	}
@@ -26,7 +31,7 @@ func NewUsers(dsn string, logger *zap.Logger) (iusers.Users, error) {
 	return u, nil
 }
 
-func (u users) GetByEmail(email string) iusers.User {
+func (u Users) GetByEmail(email string) iusers.User {
 	user := iusers.User{Email: email}
 	//todo check errors
 	u.db.First(&user)

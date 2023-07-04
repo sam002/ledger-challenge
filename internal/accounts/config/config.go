@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	Port  int    `env:"PORT" envDefault:"3000"`
+	Host  string `env:"HOST" envDefault:""`
 	DSN   string `env:"DSN,unset"`
 	Debug bool   `env:"DEBUG" envDefault:"true"`
 }
@@ -19,14 +20,16 @@ func GetConfig(logger *zap.Logger) Config {
 		logger.Error("Cannot parse log", zap.Error(err))
 	}
 	if cfg.Debug {
-		if logger, err := zap.NewDevelopment(); err != nil {
+		nLogger, err := zap.NewDevelopment()
+		logger = nLogger
+		if err != nil {
 			fmt.Printf("%+v\n", err)
 			logger.Error("Cannot parse log", zap.Error(err))
 		}
 	}
 
 	logger.Info("Successful load config")
-	logger.Debug("Successful load config", zap.Any("Config", cfg))
+	logger.Debug("Config environment", zap.Any("Config", cfg))
 
 	return cfg
 }
