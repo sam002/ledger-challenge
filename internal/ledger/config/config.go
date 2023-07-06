@@ -6,15 +6,15 @@ import (
 	"go.uber.org/zap"
 )
 
-type AccountsConfig struct {
-	Port  int    `env:"PORT" envDefault:"3000"`
+type LedgerConfig struct {
+	Port  int    `env:"PORT" envDefault:"3001"`
 	Host  string `env:"HOST" envDefault:""`
 	DSN   string `env:"DSN,unset"`
 	Debug bool   `env:"DEBUG" envDefault:"true"`
 }
 
-func GetConfig(logger *zap.Logger) AccountsConfig {
-	cfg := AccountsConfig{}
+func GetConfig(logger *zap.Logger) LedgerConfig {
+	cfg := LedgerConfig{}
 	if err := env.Parse(&cfg); err != nil {
 		fmt.Printf("%+v\n", err)
 		logger.Error("Cannot parse log", zap.Error(err))

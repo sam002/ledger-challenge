@@ -5,17 +5,19 @@ go 1.20
 require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/go-chi/chi/v5 v5.0.8
+	github.com/jackc/pgx/v5 v5.3.1
+	github.com/shopspring/decimal v1.3.1
 	go.uber.org/zap v1.24.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.2
 	moul.io/chizap v1.0.3
+	moul.io/zapgorm2 v1.3.0
 )
 
 require (
 	github.com/go-chi/chi v1.5.4 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
-	github.com/jackc/pgx/v5 v5.3.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	go.uber.org/atomic v1.8.0 // indirect

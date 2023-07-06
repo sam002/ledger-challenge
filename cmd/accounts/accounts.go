@@ -1,14 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
-	"ledger/internal/accounts/accounts/db"
+	"ledger/internal/accounts/accounts/handler"
+	"ledger/internal/accounts/accounts/model"
 	"ledger/internal/accounts/config"
-	"ledger/internal/accounts/server/server"
 	"ledger/pkg/deamonizer"
-	"ledger/pkg/uuid"
+	"ledger/pkg/server/server"
 	"net/http"
 )
 
@@ -16,6 +15,8 @@ func main() {
 	//logger
 	logger, _ := zap.NewProduction()
 	defer logger.Info("Exit. Goodbye!")
+	undo := zap.ReplaceGlobals(logger)
+	defer undo()
 	defer func(logger *zap.Logger) {
 		err := logger.Sync()
 		if err != nil {
@@ -25,7 +26,7 @@ func main() {
 
 	cfg := config.GetConfig(logger)
 
-	accounts, err := db.NewAccounts(cfg.DSN, logger)
+	accounts, err := model.NewAccounts(cfg.DSN, logger)
 	if err != nil {
 		logger.Error("Cannot init Accounts", zap.Error(err))
 		return
@@ -38,34 +39,19 @@ func main() {
 	}
 
 	apiServer.AddHandler("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Articles API"))
+		w.Write([]byte("Accounts API"))
 	})
 
-	apiServer.AddHandler("/create-issuer-account", func(w http.ResponseWriter, r *http.Request) {
-		req := struct {
-			UserID   uuid.UUID `json:"UUID"`
-			Currency string    `json:"currency"`
-			Company  string    `json:"company"`
-		}{}
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			logger.Info("Wrong query", zap.Error(err))
-		}
-		issuer, err := accounts.CreateIssuerAccount(req.UserID, req.Currency, req.Company)
-		if err != nil {
-			logger.Error("Cannot create account", zap.Error(err), zap.Any("params", req))
-		}
-		res, err := json.Marshal(issuer)
-		if err != nil {
-			logger.Info("Error marshal issuer", zap.Error(err))
-		}
-		_, err = w.Write(res)
-		if err != nil {
-			logger.Info("Interrupt write response", zap.Error(err))
-		}
-	})
+	handlers := handler.NewJsonHandler(accounts, logger)
+	apiServer.AddHandler("/create-investor-account", handlers.CreateInvestorAccount)
+	apiServer.AddHandler("/create-issuer-account", handlers.CreateIssuerAccount)
+	apiServer.AddHandler("/get-account", handlers.GetAccountByUserID)
+	apiServer.AddHandler("/deposit-account", handlers.DepositAccount)
 
 	d := deamonizer.NewDaemonizer(logger)
 	go apiServer.Run(&d)
+
+	//TODO implement transactions
 
 	d.Start()
 

@@ -1,7 +1,7 @@
 package db
 
 import (
-	"ledger/internal/accounts/money"
+	"ledger/pkg/money"
 	"time"
 )
 

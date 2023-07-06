@@ -1,3 +1,6 @@
 robotframework
 robotframework-requests
 robotframework-datadriver
+robotframework-databaselibrary
+psycopg2-binary
+robotframework-faker

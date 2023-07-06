@@ -6,8 +6,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
-	iserver "ledger/internal/accounts/server"
 	"ledger/pkg/deamonizer"
+	iserver "ledger/pkg/server"
 	"moul.io/chizap"
 	"net/http"
 )
@@ -48,5 +48,5 @@ func (c Server) Run(d *deamonizer.Daemonizer) {
 }
 
 func (c Server) AddHandler(route string, handler http.HandlerFunc) {
-	c.handler.Get(route, handler)
+	c.handler.Post(route, handler)
 }
