@@ -26,20 +26,6 @@ type Account struct {
 	Equity  decimal.Decimal `gorm:"type:decimal"`
 }
 
-type IssuerAccount struct {
-	ID        pgtype.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Company   string
-	AccountID pgtype.UUID
-	Account   Account
-}
-
-type InvestorAccount struct {
-	ID        pgtype.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	VAT       string      `gorm:"type:varchar(20)"`
-	AccountID pgtype.UUID
-	Account   Account
-}
-
 func NewAccounts(dsn string, logger *zap.Logger) (accounts.Accounts, error) {
 	//todo add schemas
 	c, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -53,6 +39,14 @@ func NewAccounts(dsn string, logger *zap.Logger) (accounts.Accounts, error) {
 		logger:  logger,
 	}
 	return &acc, nil
+}
+
+// todo rename to module
+type InvestorAccount struct {
+	ID        pgtype.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	VAT       string      `gorm:"type:varchar(20)"`
+	AccountID pgtype.UUID
+	Account   Account
 }
 
 func (a *AccountsDB) CreateInvestorAccount(userId pgtype.UUID, currency string, vat string) (*accounts.InvestorAccount, error) {
@@ -76,6 +70,14 @@ func (a *AccountsDB) CreateInvestorAccount(userId pgtype.UUID, currency string, 
 		Vat: vat,
 	}
 	return &res, nil
+}
+
+// todo rename to module
+type IssuerAccount struct {
+	ID        pgtype.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	Company   string
+	AccountID pgtype.UUID
+	Account   Account
 }
 
 func (a *AccountsDB) CreateIssuerAccount(userId pgtype.UUID, currency string, company string) (*accounts.IssuerAccount, error) {

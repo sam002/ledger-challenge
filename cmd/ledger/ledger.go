@@ -44,10 +44,10 @@ func main() {
 		w.Write([]byte("Ledger API"))
 	})
 
-	apiServer.AddHandler("/create-issue", handlers.CreateInvoice)
+	apiServer.AddHandler("/create-invoice", handlers.CreateInvoice)
 	apiServer.AddHandler("/create-bid", handlers.CreateBid)
-	apiServer.AddHandler("/approve-issue", handlers.ApproveInvoice)
-	apiServer.AddHandler("/decline-issue", handlers.DeclineInvoice)
+	apiServer.AddHandler("/approve-invoice", handlers.ApproveInvoice)
+	apiServer.AddHandler("/decline-invoice", handlers.DeclineInvoice)
 
 	d := deamonizer.NewDaemonizer(logger)
 	go apiServer.Run(&d)

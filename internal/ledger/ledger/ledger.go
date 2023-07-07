@@ -19,7 +19,7 @@ type Deal struct {
 	ID            pgtype.UUID
 	InvestorId    pgtype.UUID
 	InvoiceId     pgtype.UUID
-	Quantity      uint
+	Volume        uint
 	TransactionId pgtype.UUID
 }
 

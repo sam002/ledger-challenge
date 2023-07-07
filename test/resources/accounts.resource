@@ -43,6 +43,7 @@ Create issuer account by API
 
     ${ACCOUNT_UUID}=    Set Variable    ${res.json()}[id]
     Set Test Variable   ${ACCOUNT_UUID}
+    RETURN  ${ACCOUNT_UUID}
 
 Create investor account by API
     ${create_issuer_acc_url}=   Set Variable    ${URL_ACCOUNTS_SERVICE}/create-investor-account
@@ -59,13 +60,20 @@ Create investor account by API
 
     ${ACCOUNT_UUID}=     Set Variable    ${res.json()}[id]
     Set Test Variable   ${ACCOUNT_UUID}
+    RETURN  ${ACCOUNT_UUID}
 
 Acoount should be created in DB
     Check If Exists In Database    SELECT id FROM accounts WHERE id='${ACCOUNT_UUID}'
 
 Make deposit with correct amount
     ${deposit_url}=   Set Variable    ${URL_ACCOUNTS_SERVICE}/deposit-account
-    ${AMOUNT}=      Set Variable    ${{random.randint(1,100_000_000)}}.${{random.randint(0,9)}}${{random.randint(0,9)}}
+    ${rand_amount}=      Set Variable    ${{random.randint(1,100_000_000)}}.${{random.randint(0,9)}}${{random.randint(0,9)}}
+    Make deposit with amount    ${rand_amount}
+
+
+Make deposit with amount
+    [ARGUMENTS]     ${AMOUNT}=${{random.randint(1,100_000_000)}}.${{random.randint(0,9)}}${{random.randint(0,9)}}
+    ${deposit_url}=   Set Variable    ${URL_ACCOUNTS_SERVICE}/deposit-account
     Set Test variable   ${AMOUNT}
     ${request_dict}=    Create Dictionary   account_id=${ACCOUNT_UUID}  amount=${amount}
     ${request}=     Set Variable     ${request_dict}

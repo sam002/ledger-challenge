@@ -5,7 +5,8 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"ledger/internal/accounts/accounts/model"
+	modelAccounts "ledger/internal/accounts/accounts/model"
+	modelLedger "ledger/internal/ledger/ledger/model"
 	"ledger/internal/migration/config"
 )
 
@@ -56,13 +57,25 @@ func main() {
 
 	// todo write to file, then use other migration tool
 	db.DryRun = true
-	if err := db.AutoMigrate(&model.Account{}, &model.IssuerAccount{}, &model.InvestorAccount{}); err != nil {
+	if err := db.AutoMigrate(
+		&modelAccounts.Account{},
+		&modelAccounts.IssuerAccount{},
+		&modelAccounts.InvestorAccount{},
+		&modelLedger.InvoiceModel{},
+		&modelLedger.DealModel{},
+	); err != nil {
 		logger.Error("Error in check migrate models", zap.Error(err))
 		return
 	}
 
 	db.DryRun = false
-	if err := db.AutoMigrate(&model.Account{}, &model.IssuerAccount{}, &model.InvestorAccount{}); err != nil {
+	if err := db.AutoMigrate(
+		&modelAccounts.Account{},
+		&modelAccounts.IssuerAccount{},
+		&modelAccounts.InvestorAccount{},
+		&modelLedger.InvoiceModel{},
+		&modelLedger.DealModel{},
+	); err != nil {
 		logger.Error("Error in migrate models", zap.Error(err))
 		return
 	}
